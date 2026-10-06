@@ -856,7 +856,43 @@ function renderAdminExpenses(data) {
   adminNotice.textContent =
     `${data.length} expense(s) found.`;
 }
+// ===============================
+// ADMIN SUMMARY
+// ===============================
+function updateAdminSummary(data) {
+  const expenses = data || [];
 
+  let total = 0;
+  let approved = 0;
+  let pending = 0;
+  let rejected = 0;
+
+  expenses.forEach(expense => {
+    const amount = Number(expense.amount) || 0;
+
+    total += amount;
+
+    if (expense.status === "approved") {
+      approved += amount;
+    } else if (expense.status === "pending") {
+      pending += amount;
+    } else if (expense.status === "rejected") {
+      rejected += amount;
+    }
+  });
+
+  document.getElementById("summaryTotal").textContent =
+    `₹${total.toLocaleString("en-IN")}`;
+
+  document.getElementById("summaryApproved").textContent =
+    `₹${approved.toLocaleString("en-IN")}`;
+
+  document.getElementById("summaryPending").textContent =
+    `₹${pending.toLocaleString("en-IN")}`;
+
+  document.getElementById("summaryRejected").textContent =
+    `₹${rejected.toLocaleString("en-IN")}`;
+}
 
 // ===============================
 // FILTER EVENTS
