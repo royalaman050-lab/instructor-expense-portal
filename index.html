@@ -150,78 +150,133 @@ button:disabled {
      class="logo">
 </div>
   <div class="container" id="loginBox">
+
+  <!-- LOGIN -->
+  <div id="loginSection">
+
     <h1>Instructor Login</h1>
+
+    <p style="text-align:center; margin-top:-8px; opacity:0.75;">
+      Login to submit and track your expense claims.
+    </p>
+
     <form id="loginForm">
+
       <label for="loginEmail">Email</label>
-      <input id="loginEmail" type="email" required>
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="Enter your registered email"
+        required
+      >
 
       <label for="loginPassword">Password</label>
-      <input id="loginPassword" type="password" required>
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Enter your password"
+        required
+      >
 
-      <button type="submit" id="loginButton">Login</button>
+      <button type="submit" id="loginButton">
+        Login
+      </button>
+
       <p class="notice" id="loginNotice"></p>
-      <hr style="margin: 25px 0; border: none; border-top: 1px solid rgba(255,255,255,0.4);">
 
-<button type="button" id="showRegisterButton">
-  Create Instructor Account
-</button>
-
-<form id="registerForm" style="display:none;">
-
-  <h2>Create Instructor Account</h2>
-
-  <label for="registerName">Full Name</label>
-  <input
-    id="registerName"
-    type="text"
-    placeholder="Enter full name"
-    required
-  >
-
-  <label for="registerEmail">Email</label>
-  <input
-    id="registerEmail"
-    type="email"
-    placeholder="Enter email"
-    required
-  >
-
-  <label for="registerPhone">Phone</label>
-  <input
-    id="registerPhone"
-    type="tel"
-    placeholder="Enter phone number"
-    required
-  >
-
-  <label for="registerPassword">Password</label>
-  <input
-    id="registerPassword"
-    type="password"
-    placeholder="Create password"
-    minlength="6"
-    required
-  >
-
-  <label for="registerConfirmPassword">Confirm Password</label>
-  <input
-    id="registerConfirmPassword"
-    type="password"
-    placeholder="Confirm password"
-    minlength="6"
-    required
-  >
-
-  <button type="submit" id="registerButton">
-    Create Account
-  </button>
-
-  <button type="button" id="backToLoginButton">
-    Back to Login
-  </button>
-
-  <p class="notice" id="registerNotice"></p>
     </form>
+
+    <div style="
+      margin: 24px 0;
+      border-top: 1px solid rgba(255,255,255,0.35);
+    "></div>
+
+    <div style="text-align:center;">
+      <p style="margin-bottom:8px; font-weight:bold;">
+        New instructor?
+      </p>
+
+      <button
+        type="button"
+        id="showRegisterButton"
+      >
+        Create Instructor Account
+      </button>
+    </div>
+
+  </div>
+
+
+  <!-- REGISTRATION -->
+  <div id="registerSection" style="display:none;">
+
+    <h1>Create Instructor Account</h1>
+
+    <p style="text-align:center; margin-top:-8px; opacity:0.75;">
+      Create your account to submit expense claims.
+    </p>
+
+    <form id="registerForm">
+
+      <label for="registerName">Full Name</label>
+      <input
+        id="registerName"
+        type="text"
+        placeholder="Enter your full name"
+        required
+      >
+
+      <label for="registerEmail">Email</label>
+      <input
+        id="registerEmail"
+        type="email"
+        placeholder="Enter your email"
+        required
+      >
+
+      <label for="registerPhone">Phone</label>
+      <input
+        id="registerPhone"
+        type="tel"
+        placeholder="Enter your phone number"
+        required
+      >
+
+      <label for="registerPassword">Password</label>
+      <input
+        id="registerPassword"
+        type="password"
+        placeholder="Create a password"
+        minlength="6"
+        required
+      >
+
+      <label for="registerConfirmPassword">Confirm Password</label>
+      <input
+        id="registerConfirmPassword"
+        type="password"
+        placeholder="Re-enter your password"
+        minlength="6"
+        required
+      >
+
+      <button type="submit" id="registerButton">
+        Create Account
+      </button>
+
+      <button
+        type="button"
+        id="backToLoginButton"
+      >
+        ← Back to Login
+      </button>
+
+      <p class="notice" id="registerNotice"></p>
+
+    </form>
+
+  </div>
+
   </div>
 <main class="container" id="portal">
 
@@ -415,11 +470,17 @@ button:disabled {
       SUPABASE_URL,
       SUPABASE_KEY
     );
-      const isAdminPage =
-  new URLSearchParams(window.location.search).get("admin") === "1";
+      if (isAdminPage) {
+  document.getElementById("loginSection").querySelector("h1").textContent = "Admin Login";
 
-document.getElementById("loginBox").style.display = "block";
-document.getElementById("portal").style.display = "none";
+  document.getElementById("loginSection").querySelector("p").textContent =
+    "Authorized administrators only.";
+
+  document.getElementById("showRegisterButton").style.display = "none";
+  document.getElementById("loginSection").querySelector("div[style*='border-top']").style.display = "none";
+} else {
+  document.getElementById("showRegisterButton").style.display = "block";
+      }
     // ===============================
 // ADMIN DASHBOARD
 // ===============================
@@ -583,31 +644,41 @@ const emailField = document.getElementById("email");
 const showRegisterButton =
   document.getElementById("showRegisterButton");
 
-const registerForm =
-  document.getElementById("registerForm");
+const loginSection =
+  document.getElementById("loginSection");
+
+const registerSection =
+  document.getElementById("registerSection");
 
 const backToLoginButton =
   document.getElementById("backToLoginButton");
 
+const registerForm =
+  document.getElementById("registerForm");
+
 showRegisterButton.addEventListener("click", () => {
-  showRegisterButton.style.display = "none";
-  document.getElementById("loginForm").style.display = "none";
-  registerForm.style.display = "block";
+  loginSection.style.display = "none";
+  registerSection.style.display = "block";
+
   document.getElementById("loginNotice").textContent = "";
 });
 
 backToLoginButton.addEventListener("click", () => {
-  registerForm.style.display = "none";
-  document.getElementById("loginForm").style.display = "block";
-  showRegisterButton.style.display = "block";
+  registerSection.style.display = "none";
+  loginSection.style.display = "block";
+
   document.getElementById("registerNotice").textContent = "";
+  registerForm.reset();
 });
 
 registerForm.addEventListener("submit", async function(event) {
   event.preventDefault();
 
-  const button = document.getElementById("registerButton");
-  const notice = document.getElementById("registerNotice");
+  const button =
+    document.getElementById("registerButton");
+
+  const notice =
+    document.getElementById("registerNotice");
 
   button.disabled = true;
   button.textContent = "Creating Account...";
@@ -634,13 +705,15 @@ registerForm.addEventListener("submit", async function(event) {
     }
 
     if (password.length < 6) {
-      throw new Error("Password must be at least 6 characters.");
+      throw new Error(
+        "Password must be at least 6 characters."
+      );
     }
 
     const { data, error } =
       await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
+        email,
+        password,
         options: {
           data: {
             full_name: fullName,
@@ -651,16 +724,17 @@ registerForm.addEventListener("submit", async function(event) {
 
     if (error) throw error;
 
-    if (data.user) {
-      notice.textContent =
-        "Account created successfully. Please check your email if verification is required, then login.";
-    }
-
     registerForm.reset();
+
+    notice.textContent =
+      "Account created successfully. " +
+      "Please check your email if verification is required, " +
+      "then login.";
 
   } catch (error) {
     notice.textContent =
       "Registration failed: " + error.message;
+
   } finally {
     button.disabled = false;
     button.textContent = "Create Account";
