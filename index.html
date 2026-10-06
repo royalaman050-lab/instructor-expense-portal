@@ -323,15 +323,13 @@ button:disabled {
   <th>Location</th>
   <th>Expense</th>
   <th>Company / Vendor</th>
-  <th>Total</th>
-  <th>Brief</th>
+<th>Brief</th>
 <th>Break-up Amount & Description</th>
 <th>Total Expenses</th>
 <th>Your Payment</th>
 <th>Receipt Amount</th>
 <th>Receipt / Proof</th>
-  <th>Status</th>
-  <th>Receipt</th>
+<th>Status</th>
         </tr>
       </thead>
 
@@ -392,7 +390,7 @@ async function loadAdminExpenses() {
   if (!data || data.length === 0) {
     expensesTableBody.innerHTML = `
       <tr>
-  <td colspan="14">No expenses submitted yet.</td>
+  <td colspan="16">No expenses submitted yet.</td>
 </tr>
     `;
     adminNotice.textContent = "";
