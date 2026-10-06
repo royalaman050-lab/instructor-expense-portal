@@ -141,6 +141,29 @@ button:disabled {
   border: none;
   box-shadow: none;
 }
+    #myExpensesNotification {
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  color: #333;
+}
+
+#myExpensesNotification.status-approved {
+  background: #e8f7ee;
+  border-color: #34a853;
+  color: #137333;
+}
+
+#myExpensesNotification.status-rejected {
+  background: #fdecec;
+  border-color: #ea4335;
+  color: #b3261e;
+}
+
+#myExpensesNotification.status-pending {
+  background: #fff7e6;
+  border-color: #f9ab00;
+  color: #8a5700;
+}
   </style>
 </head>
 <body>
@@ -893,6 +916,8 @@ registerForm.addEventListener("submit", async function(event) {
     });
       // Load instructor's own expenses
 async function loadMyExpenses() {
+  const notice = document.getElementById("myExpensesNotice");
+  const notification = document.getElementById("myExpensesNotification");
   const tableBody = document.getElementById("myExpensesTableBody");
   const notice = document.getElementById("myExpensesNotice");
 
@@ -926,6 +951,28 @@ async function loadMyExpenses() {
       .order("program_date", { ascending: false });
 
     if (error) throw error;
+// Show latest expense status notification
+if (data && data.length > 0) {
+  const latestExpense = data[0];
+
+  notification.style.display = "block";
+
+  if (latestExpense.status === "approved") {
+    notification.className = "status-approved";
+    notification.textContent =
+      "✅ Your latest expense claim has been approved.";
+  } else if (latestExpense.status === "rejected") {
+    notification.className = "status-rejected";
+    notification.textContent =
+      "❌ Your latest expense claim has been rejected. Please check the rejection reason below.";
+  } else {
+    notification.className = "status-pending";
+    notification.textContent =
+      "⏳ Your latest expense claim is pending admin review.";
+  }
+} else {
+  notification.style.display = "none";
+}
 
     if (!data || data.length === 0) {
       tableBody.innerHTML = `
