@@ -535,6 +535,12 @@ button:disabled {
   </div>
 
 </div>
+  <!-- EXPORT -->
+<div style="margin:20px 0;">
+  <button type="button" id="exportExpensesCSV">
+    📥 Export CSV
+  </button>
+</div>
   <!-- ADMIN EXPENSE FILTERS -->
 <div id="adminFilters" style="
   margin: 20px 0;
@@ -893,6 +899,145 @@ function updateAdminSummary(data) {
   document.getElementById("summaryRejected").textContent =
     `₹${rejected.toLocaleString("en-IN")}`;
 }
+    // ===============================
+// EXPORT EXPENSES AS CSV
+// ===============================
+document
+  .getElementById("exportExpensesCSV")
+  .addEventListener("click", function () {
+
+    if (!allAdminExpenses || allAdminExpenses.length === 0) {
+      alert("No expenses available to export.");
+      return;
+    }
+
+    const instructor =
+      document.getElementById("filterInstructor").value;
+
+    const month =
+      document.getElementById("filterMonth").value;
+
+    const year =
+      document.getElementById("filterYear").value;
+
+    const status =
+      document.getElementById("filterStatus").value;
+
+    const filteredExpenses = allAdminExpenses.filter(expense => {
+
+      if (
+        instructor &&
+        expense.full_name !== instructor
+      ) {
+        return false;
+      }
+
+      if (
+        year &&
+        (
+          !expense.program_date ||
+          expense.program_date.substring(0, 4) !== year
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        month &&
+        (
+          !expense.program_date ||
+          expense.program_date.substring(5, 7) !== month
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        status &&
+        expense.status !== status
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (filteredExpenses.length === 0) {
+      alert("No expenses found for selected filters.");
+      return;
+    }
+
+    const headers = [
+      "Instructor",
+      "Email",
+      "Phone",
+      "Program Date",
+      "School Name",
+      "Program Type",
+      "Location",
+      "Expense Head",
+      "Company/Vendor",
+      "Brief",
+      "Break-up",
+      "Total Expenses",
+      "Your Payment",
+      "Receipt Amount",
+      "Status",
+      "Rejection Reason"
+    ];
+
+    const rows = filteredExpenses.map(expense => [
+      expense.full_name || "",
+      expense.email || "",
+      expense.phone || "",
+      expense.program_date || "",
+      expense.office_name || "",
+      expense.program_type || "",
+      expense.location || "",
+      expense.expense_head || "",
+      expense.party_name || "",
+      expense.brief || "",
+      expense.breakup || "",
+      expense.amount || 0,
+      expense.payment_details || "",
+      expense.receipt_amount || 0,
+      expense.status || "pending",
+      expense.rejection_reason || ""
+    ]);
+
+    const csv = [
+      headers,
+      ...rows
+    ]
+      .map(row =>
+        row
+          .map(value =>
+            `"${String(value)
+              .replace(/"/g, '""')
+              .replace(/\n/g, " ")}"`
+          )
+          .join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob(
+      ["\uFEFF" + csv],
+      { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download =
+      `expense-report-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  });
 
 // ===============================
 // FILTER EVENTS
