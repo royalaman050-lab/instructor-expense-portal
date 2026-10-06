@@ -235,21 +235,63 @@ button:disabled {
 
     </div>
 
-    <label for="details">Budget / Break-up Amount & Details</label>
-    <textarea
-      id="details"
-      rows="6"
-      placeholder="Enter budget / break-up amount and expense details..."
-      required
-    ></textarea>
+    <label for="brief">Brief</label>
+<textarea
+  id="brief"
+  rows="4"
+  placeholder="Enter brief description..."
+  required
+></textarea>
 
-    <label for="party">Company / Vendor Name</label>
-    <input
-      id="party"
-      type="text"
-      placeholder="Enter company or vendor name"
-      required
-    >
+<label for="breakup">Break-up Amount & Description</label>
+<textarea
+  id="breakup"
+  rows="5"
+  placeholder="Enter break-up amount and details..."
+  required
+></textarea>
+
+<label for="party">Company / Vendor Name</label>
+<input
+  id="party"
+  type="text"
+  placeholder="Enter company or vendor name"
+  required
+>
+
+<label for="amount">Total Expenses (₹)</label>
+<input
+  id="amount"
+  type="number"
+  min="0.01"
+  step="0.01"
+  placeholder="Enter total expenses"
+  required
+>
+
+<label for="payment">Your Payment</label>
+<input
+  id="payment"
+  type="text"
+  placeholder="Enter your payment details"
+>
+
+<label for="receiptAmount">Receipt Amount (₹)</label>
+<input
+  id="receiptAmount"
+  type="number"
+  min="0"
+  step="0.01"
+  placeholder="Enter receipt amount"
+>
+
+<label for="receipt">Receipt / Payment Proof</label>
+<input
+  id="receipt"
+  type="file"
+  accept="image/png,image/jpeg,image/jpg,application/pdf,.doc,.docx"
+  required
+>
 
     <label for="amount">Total Amount (₹)</label>
     <input
@@ -307,8 +349,12 @@ button:disabled {
   <th>Expense</th>
   <th>Company / Vendor</th>
   <th>Total</th>
-  <th>Budget / Break-up</th>
-  <th>Payment Details</th>
+  <th>Brief</th>
+<th>Break-up Amount & Description</th>
+<th>Total Expenses</th>
+<th>Your Payment</th>
+<th>Receipt Amount</th>
+<th>Receipt / Proof</th>
   <th>Status</th>
   <th>Receipt</th>
         </tr>
@@ -385,13 +431,15 @@ async function loadAdminExpenses() {
     <td>${expense.phone || ""}</td>
     <td>${expense.program_date || ""}</td>
     <td>${expense.office_name || ""}</td>
-    <td>${expense.programe_type || ""}</td>
+    <td>${expense.program_type || ""}</td>
     <td>${expense.location || ""}</td>
     <td>${expense.expense_head || ""}</td>
     <td>${expense.party_name || ""}</td>
+    <td>${expense.brief || ""}</td>
+    <td>${expense.breakup || ""}</td>
     <td>₹${expense.amount || 0}</td>
-    <td>${expense.details || ""}</td>
     <td>${expense.payment_details || ""}</td>
+    <td>₹${expense.receipt_amount || 0}</td>
     <td>${expense.status || ""}</td>
     <td>
       ${
@@ -550,11 +598,19 @@ const emailField = document.getElementById("email");
         const file = document.getElementById("receipt").files[0];
         if (!file) throw new Error("Please select a receipt.");
 
-        const allowedType =
-          file.type === "application/pdf" || file.type.startsWith("image/");
+        const allowedTypes = [
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+];
+
+const allowedType = allowedTypes.includes(file.type);
 
         if (!allowedType) {
-          throw new Error("Only image or PDF receipts are allowed.");
+          throw new Error("Only PNG, JPG, PDF, DOC or DOCX proof files are allowed.");
         }
 
         if (file.size > 10 * 1024 * 1024) {
@@ -574,7 +630,7 @@ const emailField = document.getElementById("email");
 
         if (uploadError) throw uploadError;
 
-        const expense = {
+  const expense = {
   employee_id: user.id,
 
   full_name: document.getElementById("name").value.trim(),
@@ -595,14 +651,19 @@ const emailField = document.getElementById("email");
   expense_head:
     document.querySelector('input[name="head"]:checked')?.value || "",
 
+  brief: document.getElementById("brief").value.trim(),
+
+  breakup_Ammount: document.getElementById("Ammount").value.trim(),
+
   party_name: document.getElementById("party").value.trim(),
 
   amount: amount,
 
-  details: document.getElementById("details").value.trim(),
-
   payment_details:
     document.getElementById("payment").value.trim(),
+
+  receipt_amount:
+    Number(document.getElementById("receiptAmount").value) || 0,
 
   receipt_path: uploadedPath,
 
