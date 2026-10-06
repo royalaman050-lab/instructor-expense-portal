@@ -556,6 +556,12 @@ button:disabled {
 ">
 
   <h3 style="margin-top:0;">Expense Reports</h3>
+  
+  <div style="margin:20px 0;">
+  <button type="button" id="printExpenseReport">
+    🖨️ Print Report
+  </button>
+  </div>
 
   <div style="
     display:grid;
@@ -584,6 +590,41 @@ button:disabled {
     </div>
 
   </div>
+    </div>
+
+  <!-- INSTRUCTOR-WISE REPORT -->
+  <div style="margin-top:25px; overflow-x:auto;">
+
+    <h3>Instructor-wise Report</h3>
+
+    <table style="
+      width:100%;
+      border-collapse:collapse;
+      min-width:650px;
+    ">
+
+      <thead>
+        <tr>
+          <th>Instructor</th>
+          <th>Claims</th>
+          <th>Total</th>
+          <th>Approved</th>
+          <th>Pending</th>
+          <th>Rejected</th>
+        </tr>
+      </thead>
+
+      <tbody id="instructorReportBody">
+        <tr>
+          <td colspan="6">No data</td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
 
 </div>
   <!-- ADMIN EXPENSE FILTERS -->
@@ -840,6 +881,7 @@ function applyExpenseFilters() {
 function renderAdminExpenses(data) {
   updateAdminSummary(data);
   updateExpenseReport(data);
+  updateInstructorReport(data);
 
   if (!data || data.length === 0) {
 
@@ -1025,6 +1067,72 @@ function updateExpenseReport(data) {
     `₹${approvedAmount.toLocaleString("en-IN")}`;
 }
     // ===============================
+// INSTRUCTOR-WISE REPORT
+// ===============================
+function updateInstructorReport(data) {
+  const expenses = data || [];
+
+  const instructorMap = {};
+
+  expenses.forEach(expense => {
+    const name = expense.full_name || "Unknown Instructor";
+    const amount = Number(expense.amount) || 0;
+
+    if (!instructorMap[name]) {
+      instructorMap[name] = {
+        claims: 0,
+        total: 0,
+        approved: 0,
+        pending: 0,
+        rejected: 0
+      };
+    }
+
+    instructorMap[name].claims += 1;
+    instructorMap[name].total += amount;
+
+    if (expense.status === "approved") {
+      instructorMap[name].approved += amount;
+    } else if (expense.status === "pending") {
+      instructorMap[name].pending += amount;
+    } else if (expense.status === "rejected") {
+      instructorMap[name].rejected += amount;
+    }
+  });
+
+  const reportBody =
+    document.getElementById("instructorReportBody");
+
+  const instructors =
+    Object.keys(instructorMap).sort();
+
+  if (instructors.length === 0) {
+    reportBody.innerHTML = `
+      <tr>
+        <td colspan="6">No data</td>
+      </tr>
+    `;
+    return;
+  }
+
+  reportBody.innerHTML = instructors.map(name => {
+
+    const item = instructorMap[name];
+
+    return `
+      <tr>
+        <td>${name}</td>
+        <td>${item.claims}</td>
+        <td>₹${item.total.toLocaleString("en-IN")}</td>
+        <td>₹${item.approved.toLocaleString("en-IN")}</td>
+        <td>₹${item.pending.toLocaleString("en-IN")}</td>
+        <td>₹${item.rejected.toLocaleString("en-IN")}</td>
+      </tr>
+    `;
+
+  }).join("");
+}
+    // ===============================
 // EXPORT EXPENSES AS CSV
 // ===============================
 document
@@ -1162,6 +1270,124 @@ document
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
+  });
+    // ===============================
+// PRINT EXPENSE REPORT
+// ===============================
+document
+  .getElementById("printExpenseReport")
+  .addEventListener("click", function () {
+
+    const reportSection =
+      document.getElementById("expenseReports");
+
+    if (!reportSection) {
+      alert("Report section not found.");
+      return;
+    }
+
+    const printWindow = window.open(
+      "",
+      "_blank",
+      "width=1000,height=800"
+    );
+
+    if (!printWindow) {
+      alert("Please allow pop-ups to print the report.");
+      return;
+    }
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Expense Report</title>
+
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 25px;
+            color: #111;
+          }
+
+          h2 {
+            margin-bottom: 5px;
+          }
+
+          .report-date {
+            color: #666;
+            margin-bottom: 20px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+
+          th,
+          td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+          }
+
+          th {
+            background: #f2f2f2;
+          }
+
+          .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+          }
+
+          .card {
+            border: 1px solid #ccc;
+            padding: 12px;
+          }
+
+          .title {
+            font-size: 13px;
+            color: #666;
+          }
+
+          .value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+          }
+
+          @media print {
+            button {
+              display: none;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <h2>Instructor Expense Report</h2>
+
+        <div class="report-date">
+          Generated on:
+          ${new Date().toLocaleString("en-IN")}
+        </div>
+
+        ${reportSection.innerHTML}
+
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
   });
 
 // ===============================
