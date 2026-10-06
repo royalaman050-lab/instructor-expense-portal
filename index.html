@@ -189,6 +189,7 @@ button:disabled {
   color: #0b1728;
 }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="brand">
@@ -539,6 +540,10 @@ button:disabled {
 <div style="margin:20px 0;">
   <button type="button" id="exportExpensesCSV">
     📥 Export CSV
+  </button>
+  
+  <button type="button" id="exportExpensesExcel">
+  📊 Export Excel
   </button>
 </div>
   <!-- ADMIN EXPENSE FILTERS -->
@@ -1058,7 +1063,112 @@ document
   .getElementById("filterStatus")
   .addEventListener("change", applyExpenseFilters);
 
+// ===============================
+// EXPORT EXPENSES AS EXCEL
+// ===============================
+document
+  .getElementById("exportExpensesExcel")
+  .addEventListener("click", function () {
 
+    if (!allAdminExpenses || allAdminExpenses.length === 0) {
+      alert("No expenses available to export.");
+      return;
+    }
+
+    const instructor =
+      document.getElementById("filterInstructor").value;
+
+    const month =
+      document.getElementById("filterMonth").value;
+
+    const year =
+      document.getElementById("filterYear").value;
+
+    const status =
+      document.getElementById("filterStatus").value;
+
+    const filteredExpenses = allAdminExpenses.filter(expense => {
+
+      if (
+        instructor &&
+        expense.full_name !== instructor
+      ) {
+        return false;
+      }
+
+      if (
+        year &&
+        (
+          !expense.program_date ||
+          expense.program_date.substring(0, 4) !== year
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        month &&
+        (
+          !expense.program_date ||
+          expense.program_date.substring(5, 7) !== month
+        )
+      ) {
+        return false;
+      }
+
+      if (
+        status &&
+        expense.status !== status
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (filteredExpenses.length === 0) {
+      alert("No expenses found for selected filters.");
+      return;
+    }
+
+    const excelData = filteredExpenses.map(expense => ({
+      "Instructor": expense.full_name || "",
+      "Email": expense.email || "",
+      "Phone": expense.phone || "",
+      "Program Date": expense.program_date || "",
+      "School Name": expense.office_name || "",
+      "Program Type": expense.program_type || "",
+      "Location": expense.location || "",
+      "Expense Head": expense.expense_head || "",
+      "Company/Vendor": expense.party_name || "",
+      "Brief": expense.brief || "",
+      "Break-up": expense.breakup || "",
+      "Total Expenses": Number(expense.amount) || 0,
+      "Your Payment": expense.payment_details || "",
+      "Receipt Amount": Number(expense.receipt_amount) || 0,
+      "Status": expense.status || "pending",
+      "Rejection Reason": expense.rejection_reason || ""
+    }));
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(excelData);
+
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Expenses"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `expense-report-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`
+    );
+  });
 // ===============================
 // CLEAR FILTERS
 // ===============================
