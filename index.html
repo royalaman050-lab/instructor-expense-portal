@@ -162,84 +162,128 @@ button:disabled {
       <p class="notice" id="loginNotice"></p>
     </form>
   </div>
+<main class="container" id="portal">
 
-  <main class="container" id="portal">
-    <h1>Instructor Expense Portal</h1>
-    <button type="button" id="logoutButton">Logout</button>
+  <h1>Instructor Expense Portal</h1>
 
-    <form id="expenseForm">
-      <label for="name">Full Name</label>
-      <input id="name" type="text" required>
+  <button type="button" id="logoutButton">Logout</button>
 
-      <label for="email">Email</label>
-      <input id="email" type="email" required>
+  <form id="expenseForm">
 
-      <label for="phone">Phone</label>
-      <input id="phone" type="tel" required>
+    <label for="name">Full Name</label>
+    <input id="name" type="text" placeholder="Enter full name" required>
 
-      <label for="date">Journey Date</label>
-      <input id="date" type="date" required>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="Enter email" required>
 
-      <label for="office">School Name</label>
-      <input id="office" type="text" required>
+    <label for="phone">Phone</label>
+    <input id="phone" type="tel" placeholder="Enter phone number" required>
 
-      <label for="journey">Journey Name</label>
-      <input id="journey" type="text" required>
+    <label for="date">Program Date</label>
+    <input id="date" type="date" required>
 
-      
-<label>Expense Head</label>
-<div class="expense-options">
-  <label class="expense-option">
-    <input type="radio" name="head" value="Bike" required>
-    <span>🏍️ Bike</span>
-   </label>
-   <label class="expense-option">
-    <input type="radio" name="head" value="Metro">
-    <span>🚇 Metro</span>
-   </label>
-   <label class="expense-option">
-    <input type="radio" name="head" value="Train">
-    <span>🚆 Train</span>
-   </label>
-    <label class="expense-option">
-     <input type="radio" name="head" value="Cab">
-     <span>🚕 Cab</span>
-     </label>
-     <label class="expense-option">
-     <input type="radio" name="head" value="Bus">
-     <span>🚌 Bus</span>
-     </label>
+    <label for="office">School Name</label>
+    <input id="office" type="text" placeholder="Enter school name" required>
+
+    <label>Type of Program</label>
+
+    <div class="expense-options">
+
       <label class="expense-option">
-      <input type="radio" name="head" value="Food">
-      <span>🍱 Food</span>
+        <input type="radio" name="program_type" value="Trip" required>
+        <span>🏕️ Trip</span>
       </label>
+
       <label class="expense-option">
-      <input type="radio" name="head" value="Hotel">
-      <span>🏨 Hotel</span>
+        <input type="radio" name="program_type" value="Day Camp">
+        <span>⛺ Day Camp</span>
       </label>
+
+    </div>
+
+    <label for="location">Location</label>
+    <input
+      id="location"
+      type="text"
+      placeholder="Enter program location"
+      required
+    >
+
+    <label>Expense</label>
+
+    <div class="expense-options">
+
       <label class="expense-option">
-      <input type="radio" name="head" value="Other">
-       <span>📌 Other</span>
-       </label>
-       </div>
-      
+        <input type="radio" name="head" value="Transport" required>
+        <span>🚗 Transport</span>
+      </label>
 
-      <label for="party">Party / Vendor Name</label>
-      <input id="party" type="text" required>
+      <label class="expense-option">
+        <input type="radio" name="head" value="Food">
+        <span>🍱 Food</span>
+      </label>
 
-      <label for="amount">Amount</label>
-      <input id="amount" type="number" min="0.01" step="0.01" required>
+      <label class="expense-option">
+        <input type="radio" name="head" value="Hotel">
+        <span>🏨 Hotel</span>
+      </label>
 
-      <label for="receipt">Receipt (Image or PDF, max 10 MB)</label>
-      <input id="receipt" type="file" accept="image/*,application/pdf" required>
+      <label class="expense-option">
+        <input type="radio" name="head" value="Other">
+        <span>📌 Other</span>
+      </label>
 
-      <label for="details">Details</label>
-      <textarea id="details" rows="4" required></textarea>
+    </div>
 
-      <button type="submit">Submit Expense</button>
-      <p class="notice" id="submitNotice"></p>
-    </form>
-  </main>
+    <label for="details">Budget / Break-up Amount & Details</label>
+    <textarea
+      id="details"
+      rows="6"
+      placeholder="Enter budget / break-up amount and expense details..."
+      required
+    ></textarea>
+
+    <label for="party">Company / Vendor Name</label>
+    <input
+      id="party"
+      type="text"
+      placeholder="Enter company or vendor name"
+      required
+    >
+
+    <label for="amount">Total Amount (₹)</label>
+    <input
+      id="amount"
+      type="number"
+      min="0.01"
+      step="0.01"
+      placeholder="Enter total amount"
+      required
+    >
+
+    <label for="payment">Payment Details</label>
+    <input
+      id="payment"
+      type="text"
+      placeholder="Enter payment details"
+    >
+
+    <label for="receipt">Receipt / Payment Proof</label>
+    <input
+      id="receipt"
+      type="file"
+      accept="image/*,application/pdf"
+      required
+    >
+
+    <button type="submit">Submit Expense</button>
+
+    <p class="notice" id="submitNotice"></p>
+
+  </form>
+
+</main>
+
   <!-- Admin Dashboard -->
 <section class="container" id="adminDashboard" style="display:none;">
   <h2>Admin Dashboard</h2>
@@ -253,18 +297,20 @@ button:disabled {
     <table border="1" cellpadding="10" cellspacing="0" width="100%">
       <thead>
         <tr>
-          <th>Instructor</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Journey Date</th>
-          <th>Office</th>
-          <th>Journey</th>
-          <th>Expense Head</th>
-          <th>Party</th>
-          <th>Amount</th>
-          <th>Details</th>
-          <th>Status</th>
-          <th>Receipt</th>
+  <th>Instructor</th>
+  <th>Email</th>
+  <th>Phone</th>
+  <th>Program Date</th>
+  <th>School Name</th>
+  <th>Program Type</th>
+  <th>Location</th>
+  <th>Expense</th>
+  <th>Company / Vendor</th>
+  <th>Total</th>
+  <th>Budget / Break-up</th>
+  <th>Payment Details</th>
+  <th>Status</th>
+  <th>Receipt</th>
         </tr>
       </thead>
 
@@ -325,37 +371,39 @@ async function loadAdminExpenses() {
   if (!data || data.length === 0) {
     expensesTableBody.innerHTML = `
       <tr>
-        <td colspan="12">No expenses submitted yet.</td>
-      </tr>
+  <td colspan="14">No expenses submitted yet.</td>
+</tr>
     `;
     adminNotice.textContent = "";
     return;
   }
 
   expensesTableBody.innerHTML = data.map(expense => `
-    <tr>
-      <td>${expense.full_name || ""}</td>
-      <td>${expense.email || ""}</td>
-      <td>${expense.phone || ""}</td>
-      <td>${expense.journey_date || ""}</td>
-      <td>${expense.office_name || ""}</td>
-      <td>${expense.journey_name || ""}</td>
-      <td>${expense.expense_head || ""}</td>
-      <td>${expense.party_name || ""}</td>
-      <td>₹${expense.amount || 0}</td>
-      <td>${expense.details || ""}</td>
-      <td>${expense.status || ""}</td>
-      <td>
-        ${
-          expense.receipt_path
-            ? `<button onclick="viewReceipt('${expense.receipt_path}')">
-                View Receipt
-              </button>`
-            : "No receipt"
-        }
-      </td>
-    </tr>
-  `).join("");
+  <tr>
+    <td>${expense.full_name || ""}</td>
+    <td>${expense.email || ""}</td>
+    <td>${expense.phone || ""}</td>
+    <td>${expense.program_date || ""}</td>
+    <td>${expense.office_name || ""}</td>
+    <td>${expense.programe_type || ""}</td>
+    <td>${expense.location || ""}</td>
+    <td>${expense.expense_head || ""}</td>
+    <td>${expense.party_name || ""}</td>
+    <td>₹${expense.amount || 0}</td>
+    <td>${expense.details || ""}</td>
+    <td>${expense.payment_details || ""}</td>
+    <td>${expense.status || ""}</td>
+    <td>
+      ${
+        expense.receipt_path
+          ? `<button onclick="viewReceipt('${expense.receipt_path}')">
+              View Receipt
+            </button>`
+          : "No receipt"
+      }
+    </td>
+  </tr>
+`).join("");
 
   adminNotice.textContent = `${data.length} expense(s) found.`;
 }
@@ -527,22 +575,43 @@ const emailField = document.getElementById("email");
         if (uploadError) throw uploadError;
 
         const expense = {
-          employee_id: user.id,
-          full_name: document.getElementById("name").value.trim(),
-          email: document.getElementById("email").value.trim(),
-          phone: document.getElementById("phone").value.trim(),
-          journey_date: document.getElementById("date").value,
-          office_name: document.getElementById("office").value.trim(),
-          journey_name: document.getElementById("journey").value.trim(),
-          expense_head: document.querySelector('input[name="head"]:checked')?.value || "",
-          party_name: document.getElementById("party").value.trim(),
-          amount: amount,
-          details: document.getElementById("details").value.trim(),
-          receipt_path: uploadedPath,
-          status: "pending",
-          reviewed_by: null,
-          reviewed_at: null
-        };
+  employee_id: user.id,
+
+  full_name: document.getElementById("name").value.trim(),
+
+  email: document.getElementById("email").value.trim(),
+
+  phone: document.getElementById("phone").value.trim(),
+
+  program_date: document.getElementById("date").value,
+
+  office_name: document.getElementById("office").value.trim(),
+
+  program_type:
+    document.querySelector('input[name="program_type"]:checked')?.value || "",
+
+  location: document.getElementById("location").value.trim(),
+
+  expense_head:
+    document.querySelector('input[name="head"]:checked')?.value || "",
+
+  party_name: document.getElementById("party").value.trim(),
+
+  amount: amount,
+
+  details: document.getElementById("details").value.trim(),
+
+  payment_details:
+    document.getElementById("payment").value.trim(),
+
+  receipt_path: uploadedPath,
+
+  status: "pending",
+
+  reviewed_by: null,
+
+  reviewed_at: null
+};
 
         const { error: insertError } = await supabaseClient
           .from("expenses")
