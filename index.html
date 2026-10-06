@@ -357,13 +357,8 @@ button:disabled {
       const isAdminPage =
   new URLSearchParams(window.location.search).get("admin") === "1";
 
-if (isAdminPage) {
-  document.getElementById("loginBox").style.display = "block";
-  document.getElementById("portal").style.display = "none";
-} else {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("portal").style.display = "block";
-}
+document.getElementById("loginBox").style.display = "block";
+document.getElementById("portal").style.display = "none";
     // ===============================
 // ADMIN DASHBOARD
 // ===============================
@@ -490,9 +485,16 @@ adminLogout.addEventListener("click", async () => {
 
         if (profileError) throw profileError;
 
-        if (String(profile.role).toLowerCase() !== "admin") {
+        const role = String(profile.role || "").toLowerCase();
+
+if (isAdminPage && role !== "admin") {
   await supabaseClient.auth.signOut();
   throw new Error("Admin access required.");
+}
+
+if (!isAdminPage && role === "admin") {
+  await supabaseClient.auth.signOut();
+  throw new Error("Please use the Admin Login page.");
 }
 
 document.getElementById("loginBox").style.display = "none";
