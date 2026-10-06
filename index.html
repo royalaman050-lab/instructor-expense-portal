@@ -482,6 +482,57 @@ button:disabled {
   <button id="adminLogout">Logout</button>
 
   <p id="adminNotice"></p>
+  <!-- ADMIN EXPENSE FILTERS -->
+<div id="adminFilters" style="
+  margin: 20px 0;
+  padding: 18px;
+  background: rgba(255,255,255,0.75);
+  border-radius: 14px;
+  border: 1px solid #d6deea;
+">
+
+  <h3 style="margin-top:0;">Expense Filters</h3>
+
+  <label for="filterInstructor">Instructor</label>
+  <select id="filterInstructor">
+    <option value="">All Instructors</option>
+  </select>
+
+  <label for="filterMonth">Month</label>
+  <select id="filterMonth">
+    <option value="">All Months</option>
+    <option value="01">January</option>
+    <option value="02">February</option>
+    <option value="03">March</option>
+    <option value="04">April</option>
+    <option value="05">May</option>
+    <option value="06">June</option>
+    <option value="07">July</option>
+    <option value="08">August</option>
+    <option value="09">September</option>
+    <option value="10">October</option>
+    <option value="11">November</option>
+    <option value="12">December</option>
+  </select>
+
+  <label for="filterYear">Year</label>
+  <select id="filterYear">
+    <option value="">All Years</option>
+  </select>
+
+  <label for="filterStatus">Status</label>
+  <select id="filterStatus">
+    <option value="">All Status</option>
+    <option value="pending">Pending</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Rejected</option>
+  </select>
+
+  <button type="button" id="clearExpenseFilters">
+    Clear Filters
+  </button>
+
+</div>
 
   <div style="overflow-x:auto;">
     <table border="1" cellpadding="10" cellspacing="0" width="100%">
@@ -553,6 +604,8 @@ const expensesTableBody = document.getElementById("expensesTableBody");
 const adminNotice = document.getElementById("adminNotice");
 const refreshExpenses = document.getElementById("refreshExpenses");
 const adminLogout = document.getElementById("adminLogout");
+    
+  let allAdminExpenses = [];
 
 async function loadAdminExpenses() {
   adminNotice.textContent = "Loading expenses...";
@@ -560,69 +613,232 @@ async function loadAdminExpenses() {
   const { data, error } = await supabaseClient
     .from("expenses")
     .select("*")
-    .order("journey_date", { ascending: false });
+    .order("program_date", { ascending: false });
 
   if (error) {
-    adminNotice.textContent = "Failed to load expenses: " + error.message;
+    adminNotice.textContent =
+      "Failed to load expenses: " + error.message;
     return;
   }
 
+  allAdminExpenses = data || [];
+
+  setupExpenseFilters(allAdminExpenses);
+  renderAdminExpenses(allAdminExpenses);
+}
+
+
+// ===============================
+// SETUP EXPENSE FILTERS
+// ===============================
+function setupExpenseFilters(expenses) {
+  const instructorSelect =
+    document.getElementById("filterInstructor");
+
+  const yearSelect =
+    document.getElementById("filterYear");
+
+  if (!instructorSelect || !yearSelect) return;
+
+  const instructors = [
+    ...new Set(
+      expenses
+        .map(expense => expense.full_name)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  instructorSelect.innerHTML =
+    `<option value="">All Instructors</option>` +
+    instructors
+      .map(name => `<option value="${name}">${name}</option>`)
+      .join("");
+
+  const years = [
+    ...new Set(
+      expenses
+        .map(expense => {
+          if (!expense.program_date) return null;
+          return expense.program_date.substring(0, 4);
+        })
+        .filter(Boolean)
+    )
+  ].sort((a, b) => b - a);
+
+  yearSelect.innerHTML =
+    `<option value="">All Years</option>` +
+    years
+      .map(year => `<option value="${year}">${year}</option>`)
+      .join("");
+}
+
+
+// ===============================
+// FILTER EXPENSES
+// ===============================
+function applyExpenseFilters() {
+  const instructor =
+    document.getElementById("filterInstructor").value;
+
+  const month =
+    document.getElementById("filterMonth").value;
+
+  const year =
+    document.getElementById("filterYear").value;
+
+  const status =
+    document.getElementById("filterStatus").value;
+
+  const filteredExpenses = allAdminExpenses.filter(expense => {
+
+    if (
+      instructor &&
+      expense.full_name !== instructor
+    ) {
+      return false;
+    }
+
+    if (year) {
+      if (
+        !expense.program_date ||
+        expense.program_date.substring(0, 4) !== year
+      ) {
+        return false;
+      }
+    }
+
+    if (month) {
+      if (
+        !expense.program_date ||
+        expense.program_date.substring(5, 7) !== month
+      ) {
+        return false;
+      }
+    }
+
+    if (
+      status &&
+      expense.status !== status
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  renderAdminExpenses(filteredExpenses);
+}
+
+
+// ===============================
+// RENDER ADMIN EXPENSES
+// ===============================
+function renderAdminExpenses(data) {
+
   if (!data || data.length === 0) {
+
     expensesTableBody.innerHTML = `
       <tr>
-  <td colspan="16">No expenses submitted yet.</td>
-</tr>
+        <td colspan="17">
+          No expenses found for selected filters.
+        </td>
+      </tr>
     `;
-    adminNotice.textContent = "";
+
+    adminNotice.textContent = "No matching expenses found.";
     return;
   }
 
   expensesTableBody.innerHTML = data.map(expense => `
-  <tr>
-    <td>${expense.full_name || ""}</td>
-    <td>${expense.email || ""}</td>
-    <td>${expense.phone || ""}</td>
-    <td>${expense.program_date || ""}</td>
-    <td>${expense.office_name || ""}</td>
-    <td>${expense.program_type || ""}</td>
-    <td>${expense.location || ""}</td>
-    <td>${expense.expense_head || ""}</td>
-    <td>${expense.party_name || ""}</td>
-    <td>${expense.brief || ""}</td>
-    <td>${expense.breakup || ""}</td>
-    <td>₹${expense.amount || 0}</td>
-    <td>${expense.payment_details || ""}</td>
-    <td>₹${expense.receipt_amount || 0}</td>
-    <td>${expense.status || ""}</td>
-    <td>
-    <td>
-  ${
-    expense.status === "pending"
-      ? `
-        <button type="button" onclick="approveExpense('${expense.id}')">
-          Approve
-        </button>
+    <tr>
+      <td>${expense.full_name || ""}</td>
+      <td>${expense.email || ""}</td>
+      <td>${expense.phone || ""}</td>
+      <td>${expense.program_date || ""}</td>
+      <td>${expense.office_name || ""}</td>
+      <td>${expense.program_type || ""}</td>
+      <td>${expense.location || ""}</td>
+      <td>${expense.expense_head || ""}</td>
+      <td>${expense.party_name || ""}</td>
+      <td>${expense.brief || ""}</td>
+      <td>${expense.breakup || ""}</td>
+      <td>₹${expense.amount || 0}</td>
+      <td>${expense.payment_details || ""}</td>
+      <td>₹${expense.receipt_amount || 0}</td>
 
-        <button type="button" onclick="rejectExpense('${expense.id}')">
-          Reject
-        </button>
-      `
-      : "-"
-  }
-</td>
-      ${
-        expense.receipt_path
-          ? `<button onclick="viewReceipt('${expense.receipt_path}')">
-              View Receipt
-            </button>`
-          : "No receipt"
-      }
-    </td>
-  </tr>
-`).join("");
+      <td>
+        ${
+          expense.receipt_path
+            ? `<button type="button"
+                onclick="viewReceipt('${expense.receipt_path}')">
+                View Receipt
+              </button>`
+            : "No receipt"
+        }
+      </td>
 
-  adminNotice.textContent = `${data.length} expense(s) found.`;
+      <td>${expense.status || "pending"}</td>
+
+      <td>
+        ${
+          expense.status === "pending"
+            ? `
+              <button type="button"
+                onclick="approveExpense('${expense.id}')">
+                Approve
+              </button>
+
+              <button type="button"
+                onclick="rejectExpense('${expense.id}')">
+                Reject
+              </button>
+            `
+            : "-"
+        }
+      </td>
+    </tr>
+  `).join("");
+
+  adminNotice.textContent =
+    `${data.length} expense(s) found.`;
 }
+
+
+// ===============================
+// FILTER EVENTS
+// ===============================
+document
+  .getElementById("filterInstructor")
+  .addEventListener("change", applyExpenseFilters);
+
+document
+  .getElementById("filterMonth")
+  .addEventListener("change", applyExpenseFilters);
+
+document
+  .getElementById("filterYear")
+  .addEventListener("change", applyExpenseFilters);
+
+document
+  .getElementById("filterStatus")
+  .addEventListener("change", applyExpenseFilters);
+
+
+// ===============================
+// CLEAR FILTERS
+// ===============================
+document
+  .getElementById("clearExpenseFilters")
+  .addEventListener("click", function() {
+
+    document.getElementById("filterInstructor").value = "";
+    document.getElementById("filterMonth").value = "";
+    document.getElementById("filterYear").value = "";
+    document.getElementById("filterStatus").value = "";
+
+    renderAdminExpenses(allAdminExpenses);
+  });
+    
     // View Receipt
 async function viewReceipt(receiptPath) {
   try {
