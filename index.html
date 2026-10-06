@@ -292,32 +292,7 @@ button:disabled {
   accept="image/png,image/jpeg,image/jpg,application/pdf,.doc,.docx"
   required
 >
-
-    <label for="amount">Total Amount (₹)</label>
-    <input
-      id="amount"
-      type="number"
-      min="0.01"
-      step="0.01"
-      placeholder="Enter total amount"
-      required
-    >
-
-    <label for="payment">Payment Details</label>
-    <input
-      id="payment"
-      type="text"
-      placeholder="Enter payment details"
-    >
-
-    <label for="receipt">Receipt / Payment Proof</label>
-    <input
-      id="receipt"
-      type="file"
-      accept="image/*,application/pdf"
-      required
-    >
-
+    
     <button type="submit">Submit Expense</button>
 
     <p class="notice" id="submitNotice"></p>
@@ -653,7 +628,7 @@ const allowedType = allowedTypes.includes(file.type);
 
   brief: document.getElementById("brief").value.trim(),
 
-  breakup_Ammount: document.getElementById("Ammount").value.trim(),
+  breakup: document.getElementById("breakup").value.trim(),
 
   party_name: document.getElementById("party").value.trim(),
 
