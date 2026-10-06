@@ -546,6 +546,46 @@ button:disabled {
   📊 Export Excel
   </button>
 </div>
+  <!-- MONTHLY / YEARLY REPORT -->
+<div id="expenseReports" style="
+  margin:25px 0;
+  padding:20px;
+  background:#ffffff;
+  border:1px solid #d6deea;
+  border-radius:14px;
+">
+
+  <h3 style="margin-top:0;">Expense Reports</h3>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+  ">
+
+    <div class="summary-card">
+      <div class="summary-title">Selected Period</div>
+      <div id="reportPeriod" class="summary-value">All</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Total Claims</div>
+      <div id="reportClaims" class="summary-value">0</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Total Amount</div>
+      <div id="reportAmount" class="summary-value">₹0</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Approved Amount</div>
+      <div id="reportApproved" class="summary-value">₹0</div>
+    </div>
+
+  </div>
+
+</div>
   <!-- ADMIN EXPENSE FILTERS -->
 <div id="adminFilters" style="
   margin: 20px 0;
@@ -799,6 +839,7 @@ function applyExpenseFilters() {
 // ===============================
 function renderAdminExpenses(data) {
   updateAdminSummary(data);
+  updateExpenseReport(data);
 
   if (!data || data.length === 0) {
 
@@ -903,6 +944,85 @@ function updateAdminSummary(data) {
 
   document.getElementById("summaryRejected").textContent =
     `₹${rejected.toLocaleString("en-IN")}`;
+}
+    // ===============================
+// MONTHLY / YEARLY REPORT
+// ===============================
+function updateExpenseReport(data) {
+  const expenses = data || [];
+
+  let totalAmount = 0;
+  let approvedAmount = 0;
+
+  expenses.forEach(expense => {
+    const amount = Number(expense.amount) || 0;
+
+    totalAmount += amount;
+
+    if (expense.status === "approved") {
+      approvedAmount += amount;
+    }
+  });
+
+  const month =
+    document.getElementById("filterMonth")?.value || "";
+
+  const year =
+    document.getElementById("filterYear")?.value || "";
+
+  let period = "All";
+
+  if (month && year) {
+    const monthNames = [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+
+    period = `${monthNames[Number(month)]} ${year}`;
+  } else if (year) {
+    period = year;
+  } else if (month) {
+    const monthNames = [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+
+    period = monthNames[Number(month)];
+  }
+
+  document.getElementById("reportPeriod").textContent =
+    period;
+
+  document.getElementById("reportClaims").textContent =
+    expenses.length;
+
+  document.getElementById("reportAmount").textContent =
+    `₹${totalAmount.toLocaleString("en-IN")}`;
+
+  document.getElementById("reportApproved").textContent =
+    `₹${approvedAmount.toLocaleString("en-IN")}`;
 }
     // ===============================
 // EXPORT EXPENSES AS CSV
