@@ -168,25 +168,90 @@ button:disabled {
    ADMIN SUMMARY CARDS
    =============================== */
 
+/* ===============================
+   ADMIN GLASS / TRANSPARENT THEME
+   =============================== */
+
 .summary-card {
-  background: #ffffff;
-  border: 1px solid #d6deea;
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 16px;
   padding: 18px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .summary-title {
   font-size: 14px;
   font-weight: 600;
-  color: #667085;
+  color: #ffffff;
   margin-bottom: 8px;
 }
 
 .summary-value {
   font-size: 24px;
   font-weight: 700;
-  color: #0b1728;
+  color: #ffffff;
+}
+
+
+/* ADMIN FILTERS */
+
+#adminFilters {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* EXPENSE REPORTS */
+
+#expenseReports {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* ADMIN TABLE */
+
+#expenseReports table,
+#adminDashboard table {
+  background: transparent !important;
+}
+
+#expenseReports th,
+#expenseReports td,
+#adminDashboard th,
+#adminDashboard td {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+
+/* ADMIN INPUTS / SELECTS */
+
+#adminDashboard input,
+#adminDashboard select,
+#adminDashboard textarea {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: inherit;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+
+/* ADMIN BUTTONS */
+
+#adminDashboard button {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
