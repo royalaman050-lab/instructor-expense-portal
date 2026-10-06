@@ -284,6 +284,32 @@ button:disabled {
 
   <button type="button" id="logoutButton">Logout</button>
 
+  <div id="myExpensesSection" style="margin-top:25px;">
+  <h2>My Expense Claims</h2>
+
+  <p id="myExpensesNotice"></p>
+
+  <div style="overflow-x:auto;">
+    <table border="1" cellpadding="10" cellspacing="0" width="100%">
+      <thead>
+        <tr>
+          <th>Program Date</th>
+          <th>School Name</th>
+          <th>Expense</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+          <th>Rejection Reason</th>
+        </tr>
+      </thead>
+
+      <tbody id="myExpensesTableBody">
+        <tr>
+          <td colspan="6">No expenses loaded.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
   <form id="expenseForm">
 
     <label for="name">Full Name</label>
@@ -726,8 +752,11 @@ if (isAdminPage) {
   document.getElementById("adminDashboard").style.display = "block";
 
   loadAdminExpenses();
+
 } else {
   document.getElementById("portal").style.display = "block";
+
+  loadMyExpenses();
 }
 
 const emailField = document.getElementById("email");
@@ -854,7 +883,70 @@ registerForm.addEventListener("submit", async function(event) {
       loginForm.reset();
       document.getElementById("expenseForm").reset();
     });
+      // Load instructor's own expenses
+async function loadMyExpenses() {
+  const tableBody = document.getElementById("myExpensesTableBody");
+  const notice = document.getElementById("myExpensesNotice");
 
+  notice.textContent = "Loading your expenses...";
+
+  try {
+    const { data: sessionData, error: sessionError } =
+      await supabaseClient.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const user = sessionData.session?.user;
+
+    if (!user) {
+      notice.textContent = "Please login first.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("expenses")
+      .select(`
+        id,
+        program_date,
+        office_name,
+        expense_head,
+        amount,
+        status,
+        rejection_reason
+      `)
+      .eq("employee_id", user.id)
+      .order("program_date", { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6">No expenses submitted yet.</td>
+        </tr>
+      `;
+      notice.textContent = "";
+      return;
+    }
+
+    tableBody.innerHTML = data.map(expense => `
+      <tr>
+        <td>${expense.program_date || ""}</td>
+        <td>${expense.office_name || ""}</td>
+        <td>${expense.expense_head || ""}</td>
+        <td>₹${expense.amount || 0}</td>
+        <td>${expense.status || "pending"}</td>
+        <td>${expense.rejection_reason || "-"}</td>
+      </tr>
+    `).join("");
+
+    notice.textContent = `${data.length} expense claim(s) found.`;
+
+  } catch (error) {
+    notice.textContent =
+      "Failed to load expenses: " + error.message;
+  }
+}
     // Submit expense
     document.getElementById("expenseForm").addEventListener("submit", async function(event) {
       event.preventDefault();
