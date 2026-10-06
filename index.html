@@ -446,6 +446,7 @@ button:disabled {
 <th>Receipt Amount</th>
 <th>Receipt / Proof</th>
 <th>Status</th>
+<th>Action</th>
         </tr>
       </thead>
 
@@ -537,6 +538,21 @@ async function loadAdminExpenses() {
     <td>₹${expense.receipt_amount || 0}</td>
     <td>${expense.status || ""}</td>
     <td>
+    <td>
+  ${
+    expense.status === "pending"
+      ? `
+        <button type="button" onclick="approveExpense('${expense.id}')">
+          Approve
+        </button>
+
+        <button type="button" onclick="rejectExpense('${expense.id}')">
+          Reject
+        </button>
+      `
+      : "-"
+  }
+</td>
       ${
         expense.receipt_path
           ? `<button onclick="viewReceipt('${expense.receipt_path}')">
@@ -568,6 +584,85 @@ async function viewReceipt(receiptPath) {
 
   } catch (error) {
     alert("Receipt open nahi ho rahi: " + error.message);
+  }
+}
+    // Approve Expense
+async function approveExpense(expenseId) {
+  const confirmed = confirm("Approve this expense?");
+  if (!confirmed) return;
+
+  try {
+    const { data: sessionData } =
+      await supabaseClient.auth.getSession();
+
+    const adminUser = sessionData.session?.user;
+
+    if (!adminUser) {
+      alert("Please login as admin.");
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("expenses")
+      .update({
+        status: "approved",
+        reviewed_by: adminUser.id,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq("id", expenseId);
+
+    if (error) throw error;
+
+    alert("Expense approved successfully.");
+
+    await loadAdminExpenses();
+
+  } catch (error) {
+    alert("Approve failed: " + error.message);
+  }
+}
+
+
+// Reject Expense
+async function rejectExpense(expenseId) {
+  const reason = prompt("Enter rejection reason:");
+
+  if (reason === null) return;
+
+  if (!reason.trim()) {
+    alert("Please enter a rejection reason.");
+    return;
+  }
+
+  try {
+    const { data: sessionData } =
+      await supabaseClient.auth.getSession();
+
+    const adminUser = sessionData.session?.user;
+
+    if (!adminUser) {
+      alert("Please login as admin.");
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("expenses")
+      .update({
+        status: "rejected",
+        rejection_reason: reason.trim(),
+        reviewed_by: adminUser.id,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq("id", expenseId);
+
+    if (error) throw error;
+
+    alert("Expense rejected successfully.");
+
+    await loadAdminExpenses();
+
+  } catch (error) {
+    alert("Reject failed: " + error.message);
   }
 }
 
