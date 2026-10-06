@@ -552,16 +552,11 @@ const emailField = document.getElementById("email");
 
   if (sessionError) throw sessionError;
 
-  let user = sessionData.session?.user;
+  const user = sessionData.session?.user;
 
-  if (!user) {
-    const { data, error } =
-      await supabaseClient.auth.signInAnonymously();
-
-    if (error) throw error;
-
-    user = data.user;
-  }
+if (!user) {
+  throw new Error("Please login before submitting an expense.");
+}
 
   const amount = Number(document.getElementById("amount").value);
   if (!Number.isFinite(amount) || amount <= 0) {
