@@ -253,6 +253,172 @@ button:disabled {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+    
+/* ==================================
+   TRANSPARENT INSTRUCTOR EXPENSE CARDS
+   ================================== */
+
+#adminDashboard .expense-card-row > td {
+  padding: 12px 0;
+  border: none !important;
+  background: transparent !important;
+}
+
+#adminDashboard .expense-profile-card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 22px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #fff;
+}
+
+#adminDashboard .expense-profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+#adminDashboard .expense-profile-header h3 {
+  margin: 0 0 7px;
+  font-size: 21px;
+  overflow-wrap: anywhere;
+}
+
+#adminDashboard .expense-profile-contact,
+#adminDashboard .expense-profile-header small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.88);
+  overflow-wrap: anywhere;
+}
+
+#adminDashboard .expense-status {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+#adminDashboard .expense-status.status-approved {
+  background: rgba(35, 180, 100, 0.24);
+  border-color: rgba(100, 255, 160, 0.6);
+}
+
+#adminDashboard .expense-status.status-rejected {
+  background: rgba(230, 65, 65, 0.24);
+  border-color: rgba(255, 150, 150, 0.65);
+}
+
+#adminDashboard .expense-status.status-pending {
+  background: rgba(255, 180, 40, 0.24);
+  border-color: rgba(255, 220, 130, 0.65);
+}
+
+#adminDashboard .expense-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#adminDashboard .expense-detail {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+#adminDashboard .expense-detail > span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+#adminDashboard .expense-detail strong {
+  display: block;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#adminDashboard .expense-detail-wide {
+  margin-top: 12px;
+}
+
+#adminDashboard .expense-detail p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+#adminDashboard .expense-breakup {
+  font-variant-numeric: tabular-nums;
+}
+
+#adminDashboard .expense-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+  align-items: center;
+}
+
+#adminDashboard .expense-profile-actions button {
+  width: auto;
+  flex: 1 1 140px;
+  margin-top: 0;
+}
+
+#adminDashboard .expense-profile-actions .expense-reject-button {
+  background: linear-gradient(135deg, #b42332, #e05260);
+}
+
+#adminDashboard .expense-no-receipt {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 520px) {
+  #adminDashboard .expense-profile-card {
+    padding: 15px;
+    border-radius: 16px;
+  }
+
+  #adminDashboard .expense-profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #adminDashboard .expense-profile-header h3 {
+    font-size: 19px;
+  }
+
+  #adminDashboard .expense-profile-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #adminDashboard .expense-profile-actions button {
+    width: 100%;
+    flex: auto;
+  }
+}
+    
   </style>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
