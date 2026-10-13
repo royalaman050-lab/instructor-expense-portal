@@ -419,6 +419,148 @@ button:disabled {
   }
 }
     
+/* Instructor expense profile modal */
+.expense-profile-modal[hidden] {
+  display: none !important;
+}
+
+.expense-profile-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.expense-profile-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 15, 30, 0.76);
+  backdrop-filter: blur(8px);
+}
+
+.expense-profile-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 20px;
+  background: rgba(15, 35, 58, 0.97);
+  color: #fff;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.expense-profile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.expense-profile-topbar > span {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: #a9c9f6;
+}
+
+.expense-profile-close {
+  width: auto;
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  .expense-profile-panel {
+    padding: 15px;
+  }
+
+  .expense-profile-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+    
+.expense-profile-panel .expense-profile-card {
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  color: #fff;
+}
+
+.expense-profile-panel .expense-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.expense-profile-panel .expense-detail {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.expense-profile-panel .expense-detail span {
+  display: block;
+  margin-bottom: 7px;
+  color: #c7d8ec;
+  font-size: 12px;
+}
+
+.expense-profile-panel .expense-detail strong {
+  overflow-wrap: anywhere;
+}
+
+.expense-profile-panel .expense-profile-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.expense-profile-panel .expense-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.expense-profile-panel .expense-profile-actions button {
+  width: auto;
+  flex: 1 1 140px;
+  margin-top: 0;
+}
+
+@media (max-width: 520px) {
+  .expense-profile-panel .expense-profile-card {
+    padding: 14px;
+  }
+
+  .expense-profile-panel .expense-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-profile-panel .expense-profile-actions button {
+    width: 100%;
+    flex: auto;
+  }
+}
+    
   </style>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
@@ -1823,8 +1965,25 @@ document
   });
     
     // View Receipt
+
 async function viewReceipt(receiptPath) {
+  let receiptWindow = null;
+
   try {
+    // Card button se aane wala encoded path decode karo.
+    try {
+      receiptPath = decodeURIComponent(receiptPath);
+    } catch (_) {
+      // Agar path pehle se decoded hai, use as-is rakho.
+    }
+
+    if (!receiptPath) {
+      throw new Error("Receipt path is missing.");
+    }
+
+    // Click ke waqt tab kholo, taaki popup blocker use na roke.
+    receiptWindow = window.open("about:blank", "_blank");
+
     const { data, error } = await supabaseClient
       .storage
       .from("expense-receipts")
@@ -1836,12 +1995,22 @@ async function viewReceipt(receiptPath) {
       throw new Error("Could not create receipt link.");
     }
 
-    window.open(data.signedUrl, "_blank");
+    if (receiptWindow) {
+      receiptWindow.location.href = data.signedUrl;
+    } else {
+      // Popup blocked ho toh current tab mein receipt kholo.
+      window.location.href = data.signedUrl;
+    }
 
   } catch (error) {
+    if (receiptWindow && !receiptWindow.closed) {
+      receiptWindow.close();
+    }
+
     alert("Receipt open nahi ho rahi: " + error.message);
   }
 }
+    
     // Approve Expense
 async function approveExpense(expenseId) {
   const confirmed = confirm("Approve this expense?");
@@ -2335,5 +2504,79 @@ const allowedType = allowedTypes.includes(file.type);
       }
     });
   </script>
+  
+<!-- Instructor Expense Profile Modal -->
+<div id="expenseProfileModal" class="expense-profile-modal" hidden>
+  <div class="expense-profile-overlay" data-close-profile></div>
+
+  <section class="expense-profile-panel"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="expenseProfileName">
+
+    <div class="expense-profile-topbar">
+      <button type="button" id="closeExpenseProfile"
+              class="expense-profile-close">
+        ← Back to Expenses
+      </button>
+      <span>EXPENSE CLAIM PROFILE</span>
+    </div>
+
+    <div id="expenseProfileContent"></div>
+  </section>
+</div>
+  
+/* Open and close instructor expense profiles */
+(function () {
+  const modal = document.getElementById("expenseProfileModal");
+  const content = document.getElementById("expenseProfileContent");
+  const closeButton = document.getElementById("closeExpenseProfile");
+
+  if (!modal || !content || !closeButton) {
+    console.error("Expense profile modal elements not found.");
+    return;
+  }
+
+  function closeProfile() {
+    modal.hidden = true;
+    content.innerHTML = "";
+  }
+
+  document.addEventListener("click", function (event) {
+    const closeTarget = event.target.closest("[data-close-profile]");
+
+    if (closeTarget || event.target.closest("#closeExpenseProfile")) {
+      closeProfile();
+      return;
+    }
+
+    const card = event.target.closest(
+      "#adminDashboard .expense-profile-card"
+    );
+
+    if (!card || modal.contains(card)) return;
+
+    // Buttons and links should keep their existing actions.
+    if (event.target.closest("button, a, input, select, textarea")) return;
+
+    content.innerHTML = "";
+
+    const profile = document.createElement("div");
+    profile.className = "expense-profile-card expense-profile-card-expanded";
+    profile.innerHTML = card.innerHTML;
+
+    content.appendChild(profile);
+    modal.hidden = false;
+    closeButton.focus();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !modal.hidden) {
+      closeProfile();
+    }
+  });
+})();
+  
+  
 </body>
 </html>
