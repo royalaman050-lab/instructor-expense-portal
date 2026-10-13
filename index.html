@@ -943,13 +943,13 @@ function applyExpenseFilters() {
 // ===============================
 // RENDER ADMIN EXPENSES
 // ===============================
+
 function renderAdminExpenses(data) {
   updateAdminSummary(data);
   updateExpenseReport(data);
   updateInstructorReport(data);
 
   if (!data || data.length === 0) {
-
     expensesTableBody.innerHTML = `
       <tr>
         <td colspan="17">
@@ -963,58 +963,119 @@ function renderAdminExpenses(data) {
   }
 
   expensesTableBody.innerHTML = data.map(expense => `
-    <tr>
-      <td>${expense.full_name || ""}</td>
-      <td>${expense.email || ""}</td>
-      <td>${expense.phone || ""}</td>
-      <td>${expense.program_date || ""}</td>
-      <td>${expense.office_name || ""}</td>
-      <td>${expense.program_type || ""}</td>
-      <td>${expense.location || ""}</td>
-      <td>${expense.expense_head || ""}</td>
-      <td>${expense.party_name || ""}</td>
-      <td>${expense.brief || ""}</td>
-      <td>${expense.breakup || ""}</td>
-      <td>₹${expense.amount || 0}</td>
-      <td>${expense.payment_details || ""}</td>
-      <td>₹${expense.receipt_amount || 0}</td>
+    <tr class="expense-card-row">
+      <td colspan="17">
+        <div class="expense-profile-card">
 
-      <td>
-        ${
-          expense.receipt_path
-            ? `<button type="button"
-                onclick="viewReceipt('${expense.receipt_path}')">
-                View Receipt
-              </button>`
-            : "No receipt"
-        }
-      </td>
+          <div class="expense-profile-header">
+            <div>
+              <h3>${escapeExpenseText(expense.full_name || "Instructor")}</h3>
+              <div class="expense-profile-contact">
+                ${escapeExpenseText(expense.email || "")}
+                ${expense.phone ? " · " + escapeExpenseText(expense.phone) : ""}
+              </div>
+              <small>Claim ID: ${escapeExpenseText(expense.id || "")}</small>
+            </div>
 
-      <td>${expense.status || "pending"}</td>
+            <span class="expense-status status-${escapeExpenseText(expense.status || "pending")}">
+              ${escapeExpenseText(expense.status || "pending")}
+            </span>
+          </div>
 
-      <td>
-        ${
-          expense.status === "pending"
-            ? `
-              <button type="button"
-                onclick="approveExpense('${expense.id}')">
-                Approve
-              </button>
+          <div class="expense-profile-grid">
+            <div class="expense-detail">
+              <span>Program Date</span>
+              <strong>${escapeExpenseText(expense.program_date || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>School / Office</span>
+              <strong>${escapeExpenseText(expense.office_name || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Program Type</span>
+              <strong>${escapeExpenseText(expense.program_type || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Location</span>
+              <strong>${escapeExpenseText(expense.location || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Expense Head</span>
+              <strong>${escapeExpenseText(expense.expense_head || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Company / Vendor</span>
+              <strong>${escapeExpenseText(expense.party_name || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Total Expenses</span>
+              <strong>₹${(Number(expense.amount) || 0).toLocaleString("en-IN")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Payment Details</span>
+              <strong>${escapeExpenseText(expense.payment_details || "—")}</strong>
+            </div>
+            <div class="expense-detail">
+              <span>Receipt Amount</span>
+              <strong>₹${(Number(expense.receipt_amount) || 0).toLocaleString("en-IN")}</strong>
+            </div>
+          </div>
 
-              <button type="button"
-                onclick="rejectExpense('${expense.id}')">
-                Reject
-              </button>
-            `
-            : "-"
-        }
+          <div class="expense-detail expense-detail-wide">
+            <span>Brief Description</span>
+            <p>${escapeExpenseText(expense.brief || "—")}</p>
+          </div>
+
+          <div class="expense-detail expense-detail-wide">
+            <span>Break-up Amount & Description</span>
+            <p class="expense-breakup">${escapeExpenseText(expense.breakup || "—")}</p>
+          </div>
+
+          <div class="expense-profile-actions">
+            ${
+              expense.receipt_path
+                ? `<button type="button"
+                    onclick="viewReceipt('${encodeURIComponent(expense.receipt_path)}')">
+                    View Receipt / Proof
+                  </button>`
+                : `<span class="expense-no-receipt">No receipt uploaded</span>`
+            }
+
+            ${
+              expense.status === "pending"
+                ? `
+                  <button type="button"
+                    onclick="approveExpense('${encodeURIComponent(expense.id)}')">
+                    Approve
+                  </button>
+                  <button type="button"
+                    class="expense-reject-button"
+                    onclick="rejectExpense('${encodeURIComponent(expense.id)}')">
+                    Reject
+                  </button>
+                `
+                : ""
+            }
+          </div>
+
+        </div>
       </td>
     </tr>
   `).join("");
 
-  adminNotice.textContent =
-    `${data.length} expense(s) found.`;
+  adminNotice.textContent = `${data.length} expense(s) found.`;
 }
+
+function escapeExpenseText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+    
 // ===============================
 // ADMIN SUMMARY
 // ===============================
