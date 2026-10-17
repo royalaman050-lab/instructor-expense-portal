@@ -857,10 +857,11 @@ button:disabled {
 >
 
 <label for="receipt">Receipt / Payment Proof</label>
+
 <input
   id="receipt"
   type="file"
-  accept="image/png,image/jpeg,image/jpg,application/pdf,.doc,.docx"
+  accept="image/*,application/pdf"
   required
 >
     
@@ -2408,15 +2409,14 @@ if (!user) {
   "image/png",
   "image/jpeg",
   "image/jpg",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  "image/webp"
 ];
 
 const allowedType = allowedTypes.includes(file.type);
 
-        if (!allowedType) {
-          throw new Error("Only PNG, JPG, PDF, DOC or DOCX proof files are allowed.");
-        }
+         if (!allowedType) {
+  throw new Error("Only JPG, PNG, WEBP or PDF proof files are allowed.");
+         }
 
         if (file.size > 10 * 1024 * 1024) {
           throw new Error("Receipt must be 10 MB or smaller.");
